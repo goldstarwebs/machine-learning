@@ -37,8 +37,12 @@ class LearningAgent(Agent):
         ########### 
         ## TO DO ##
         ###########
+        
+        #epsilon for default learning
+        #self.epsilon -= 0.05
         # Update epsilon using a decay function of your choice
         self.epsilon = 1.0/self.trial_num
+
         self.trial_num += 1
 
         # Update additional class parameters as needed
@@ -78,9 +82,7 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Calculate the maximum Q-value of all actions for a given state
-        q_val = self.Q[state]
-
-        maxQ = max(q_val, key=lambda k: q_val[k])
+        maxQ = max(self.Q[state].values())
 
         return maxQ 
 
@@ -129,7 +131,14 @@ class LearningAgent(Agent):
 
             #   Otherwise, choose an action with the highest Q-value for the current state 
             else:
-                action = self.get_maxQ(self.state)
+                max_q = self.get_maxQ(self.state)
+                #get all actions (could be as many as 4) that have that Q value
+                possible_actions = []
+
+                for qval in self.Q[state]:
+                    if self.Q[state][qval] == max_q: possible_actions.append(qval)
+
+                action = random.choice(possible_actions)
 
         return action
 
@@ -182,6 +191,10 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
+
+    #settings to run default learning simulation again
+    #agent = env.create_agent(LearningAgent, learning=True)
+    #settings for improved learning
     agent = env.create_agent(LearningAgent, learning=True, alpha=0.75)
     
     ##############
@@ -197,6 +210,10 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
+
+    #settings to run default learning simulation again
+    #sim = Simulator(env, update_delay=0.01, log_metrics=True, display=True)
+    #settings for improved learning
     sim = Simulator(env, update_delay=0.01, log_metrics=True, display=True, optimized=True)
     
     ##############
@@ -204,6 +221,10 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
+
+    #settings to run default learning simulation again
+    #sim.run(n_test=10)
+    #settings for improved learning
     sim.run(n_test=10, tolerance=0.015)
 
 
